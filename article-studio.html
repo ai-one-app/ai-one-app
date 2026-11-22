@@ -14,6 +14,7 @@ a{color:#c8c0ff;text-decoration:none}main{width:min(1100px,calc(100% - 30px));ma
 textarea,input,select{font:inherit;color:var(--text);background:#091222;border:1px solid #34435e;border-radius:11px;padding:12px;width:100%;outline:none}textarea:focus,input:focus,select:focus{border-color:var(--violet)}#article{min-height:280px;resize:vertical;line-height:1.9}label{display:block;font-size:12px;color:#c9d2e3;margin:12px 0 7px}.row{display:flex;gap:10px}.row>*{flex:1;min-width:0}.btn{border:0;border-radius:11px;padding:12px 16px;font:inherit;font-weight:700;cursor:pointer}.primary{background:linear-gradient(120deg,#b8aaff,#788ce1);color:#10162b}.secondary{background:#202d46;color:#e8edfa;border:1px solid #3a4964}.gold{background:linear-gradient(120deg,#ffe18a,#dcae32);color:#2b2108}.btn:disabled{opacity:.45;cursor:not-allowed}.notice{background:#1e293d;border:1px solid #354560;border-radius:12px;padding:12px;color:#c3cee0;font-size:11px;line-height:1.8}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.slide{background:#101a2c;border:1px solid var(--line);border-radius:16px;overflow:hidden}.slide img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block;background:#091222}.slide-body{padding:13px}.slide-body input{margin-bottom:8px}.slide-body textarea{min-height:86px;font-size:12px;line-height:1.7;resize:vertical}.slide-actions{display:flex;gap:7px;margin-top:9px}.slide-actions button{flex:1;padding:9px 6px;font-size:11px}.empty{border:1px dashed #3a4964;border-radius:15px;padding:35px 15px;text-align:center;color:var(--muted);font-size:13px;grid-column:1/-1}.status{font-size:11px;color:var(--gold);min-height:20px;margin-top:8px}.check{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;margin:12px 0}.check input{width:auto}.progress{height:6px;background:#26334b;border-radius:20px;overflow:hidden;margin-top:10px}.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,#8b7be9,#f4cb58);transition:width .25s}.side .panel{position:sticky;top:14px}.small{font-size:10px;color:var(--muted);line-height:1.7}.hidden{display:none!important}
 @media(max-width:850px){.layout{grid-template-columns:1fr}.side .panel{position:static}.cards{grid-template-columns:1fr 1fr}}@media(max-width:520px){header{padding:15px}.cards{grid-template-columns:1fr}.panel{padding:14px}.row{flex-direction:column}}
 </style>
+<script defer src="https://cdn.jsdelivr.net/npm/@pollinations/ui@0.1.0-alpha.20/dist/connect.js"></script>
 </head>
 <body>
 <header><div class="brand"><div class="mark">A</div><div><b>AI-ONE</b><small>استوديو تحويل المقالات إلى صور</small></div></div><a href="./index.html">العودة للمساعد ←</a></header>
@@ -29,37 +30,32 @@ textarea,input,select{font:inherit;color:var(--text);background:#091222;border:1
 <label for="style">الهوية البصرية</label><select id="style"><option value="dark cinematic editorial, deep navy and black background, gold yellow and red accents, dramatic studio lighting, premium Arabic social media infographic">سينمائي داكن — أزرق وذهبي وأحمر</option><option value="clean modern editorial infographic, warm ivory background, dark charcoal typography, muted gold accents">تحريري فاتح — عاجي وذهبي</option><option value="bold modern graphic poster, electric blue, white and orange, strong geometric shapes">جرافيك جريء — أزرق وبرتقالي</option></select>
 <label for="ratio">مقاس الصورة</label><select id="ratio"><option value="portrait">طولي 4:5 — منشورات</option><option value="square">مربع 1:1</option><option value="story">قصة 9:16</option></select>
 <label for="model">نموذج الصور</label><select id="model"><option value="black-forest-labs/flux.1-schnell">Flux Schnell</option><option value="tongyi-mai/z-image-turbo">Z Image Turbo</option></select>
-<label>ربط حساب Pollinations</label><button class="btn secondary" id="connectPollinations" style="width:100%">🔐 ربط حسابي لتوليد الصور</button><button class="btn secondary hidden" id="disconnectPollinations" style="width:100%;margin-top:8px">فصل الحساب</button>
-<p class="small">سيتم تحويلك إلى Pollinations للموافقة على استخدام رصيدك. المفتاح المؤقت يبقى في ذاكرة جلسة المتصفح ولا يُحفظ في الموقع. قد يستهلك التوليد رصيداً وفق ميزانية الموافقة.</p>
+<label>ربط حساب Pollinations</label><polli-connect app-key="pk_EDn5OVAUvDpuFlWT" budget="5" expiry="7" models="image" permissions="profile,usage"></polli-connect>
+<p class="small">اضغط زر Pollinations للموافقة على استخدام رصيدك. تقدر تفصل الحساب أو تلغي المفتاح من لوحة Pollinations. الحد المقترح للموافقة 5 دولارات ومدة المفتاح 7 أيام.</p>
 <label class="check"><input type="checkbox" id="safe" checked> تجنّب العري والإيحاءات والمشاهد الخادشة</label>
 <button class="btn gold" id="generateAll" style="width:100%" disabled>✦ أنشئ كل الصور بالترتيب</button><div class="progress"><span id="progress"></span></div><div class="status" id="genStatus"></div>
 <div class="notice" style="margin-top:14px">مهم: مولّد الصور يرسم المشهد، لكنه قد لا يكتب العربية بدقة. لذلك العنوان والنص سيظهران في بطاقة الصورة ويمكنك إضافتهما لاحقاً في Canva أو أي محرر صور.</div>
 </div></aside></div></main>
 <script>
 const $=id=>document.getElementById(id);let slides=[];
-const POLLINATIONS_APP_KEY='pk_EDn5OVAUvDpuFlWT';
-const POLLINATIONS_REDIRECT='https://ai-one-app.github.io/ai-one-app/pollinations-callback.html';
 function updatePollinationsUI(){
  const token=sessionStorage.getItem('pollinations_access_token');
- $('connectPollinations').classList.toggle('hidden',!!token);
- $('disconnectPollinations').classList.toggle('hidden',!token);
  $('generateAll').disabled=!slides.length||!token;
  if(token)$('genStatus').textContent='حساب Pollinations متصل وجاهز للتوليد.';
 }
-function b64url(bytes){return btoa(String.fromCharCode(...new Uint8Array(bytes))).split('+').join('-').split('/').join('_').split('=').join('')}
-async function connectPollinations(){
- try{
-  const bytes=crypto.getRandomValues(new Uint8Array(48));
-  const verifier=b64url(bytes);
-  const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(verifier));
-  const challenge=b64url(digest);
-  const state=b64url(crypto.getRandomValues(new Uint8Array(24)));
-  sessionStorage.setItem('pollinations_pkce_verifier',verifier);
-  sessionStorage.setItem('pollinations_oauth_state',state);
-  const p=new URLSearchParams({response_type:'code',client_id:POLLINATIONS_APP_KEY,redirect_uri:POLLINATIONS_REDIRECT,scope:'profile usage',models:'image',expiry:'7',state,code_challenge:challenge,code_challenge_method:'S256'});
-  location.href='https://enter.pollinations.ai/authorize?'+p.toString();
- }catch(e){$('genStatus').textContent='تعذر بدء الربط: '+e.message}
+function initPollinationsConnect(){
+ const connect=document.querySelector('polli-connect');
+ if(!connect)return;
+ connect.addEventListener('change',()=>{
+  const token=connect.apiKey;
+  if(token)sessionStorage.setItem('pollinations_access_token',token);
+  else sessionStorage.removeItem('pollinations_access_token');
+  updatePollinationsUI();
+ });
+ if(connect.apiKey)sessionStorage.setItem('pollinations_access_token',connect.apiKey);
+ updatePollinationsUI();
 }
+customElements.whenDefined('polli-connect').then(initPollinationsConnect);
 const samples=[
 ["الغلاف","أرخص لحمة في العالم","غلاف رمزي عن اقتصاد المشاهدات على منصات التواصل: هاتف يعرض بثاً مباشراً وأرقام مشاهدة، عملات ذهبية وسهم صاعد، دون إظهار أجساد أو مشاهد خادشة."],
 ["بورصة الرخص","الحكاية ماشية إزاي؟ بورصة الرخص","مشهد رمزي يشبه سوقاً مالياً: ثلاثة أعمدة مكتوب عليها البضاعة والبائع والزبون، هاتف صغير وحلقات إضاءة وكاميرا، دون أشخاص مكشوفين."],
@@ -102,6 +98,6 @@ async function download(i){
   canvas.toBlob(blob=>{if(!blob){$('genStatus').textContent='تعذر تجهيز ملف التحميل.';return}const a=document.createElement('a');const u=URL.createObjectURL(blob);a.href=u;a.download='article-image-'+String(i+1).padStart(2,'0')+'.png';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),3000)},'image/png');
  };img.onerror=()=>$('genStatus').textContent='تعذر تجهيز الصورة للتحميل.';img.src=s.url;
 }
-$('split').addEventListener('click',splitArticle);$('sample').addEventListener('click',()=>{$('article').value=samples.map((s,i)=>'# '+s[1]+'\n'+s[2]).join('\n\n');splitArticle()});$('generateAll').addEventListener('click',generateAll);$('downloadAll').addEventListener('click',()=>slides.forEach((s,i)=>{if(s.url)setTimeout(()=>download(i),i*350)}));$('style').addEventListener('change',()=>slides.forEach(s=>s.prompt=visualPrompt(s.body)));$('safe').addEventListener('change',()=>slides.forEach(s=>s.prompt=visualPrompt(s.body)));$('connectPollinations').addEventListener('click',connectPollinations);$('disconnectPollinations').addEventListener('click',()=>{sessionStorage.removeItem('pollinations_access_token');updatePollinationsUI()});$('ratio').addEventListener('change',()=>{});$('split').addEventListener('click',()=>{$('generateAll').disabled=!slides.length||!sessionStorage.getItem('pollinations_access_token')});updatePollinationsUI();
+$('split').addEventListener('click',splitArticle);$('sample').addEventListener('click',()=>{$('article').value=samples.map((s,i)=>'# '+s[1]+'\n'+s[2]).join('\n\n');splitArticle()});$('generateAll').addEventListener('click',generateAll);$('downloadAll').addEventListener('click',()=>slides.forEach((s,i)=>{if(s.url)setTimeout(()=>download(i),i*350)}));$('style').addEventListener('change',()=>slides.forEach(s=>s.prompt=visualPrompt(s.body)));$('safe').addEventListener('change',()=>slides.forEach(s=>s.prompt=visualPrompt(s.body)));$('ratio').addEventListener('change',()=>{});$('split').addEventListener('click',()=>{$('generateAll').disabled=!slides.length||!sessionStorage.getItem('pollinations_access_token')});updatePollinationsUI();
 </script>
 </body></html>
