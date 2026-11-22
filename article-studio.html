@@ -46,7 +46,7 @@ function updatePollinationsUI(){
  $('generateAll').disabled=!slides.length||!token;
  if(token)$('genStatus').textContent='حساب Pollinations متصل وجاهز للتوليد.';
 }
-function b64url(bytes){return btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'')}
+function b64url(bytes){return btoa(String.fromCharCode(...new Uint8Array(bytes))).split('+').join('-').split('/').join('_').split('=').join('')}
 async function connectPollinations(){
  try{
   const bytes=crypto.getRandomValues(new Uint8Array(48));
