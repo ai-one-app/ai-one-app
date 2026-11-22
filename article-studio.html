@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1020"><title>استوديو المقال إلى صور | AI-ONE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&display=swap');
+:root{--bg:#080e1b;--panel:#111b2d;--line:#26334b;--text:#f2f5fc;--muted:#9aa8be;--gold:#f5c84b;--violet:#a99aff;--red:#e94d52}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% 0,#29365a55,transparent 38%),var(--bg);color:var(--text);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;min-height:100vh}
+header{padding:22px max(18px,calc((100vw - 1100px)/2));border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:12px}.mark{width:42px;height:42px;border-radius:14px;background:linear-gradient(140deg,#c2b5ff,#6578d1);display:grid;place-items:center;color:#11172a;font-weight:800;font-size:23px}.brand b{display:block;letter-spacing:1px}.brand small{color:var(--muted);font-size:11px}
+a{color:#c8c0ff;text-decoration:none}main{width:min(1100px,calc(100% - 30px));margin:28px auto 70px}.hero{padding:25px 4px 22px}.eyebrow{color:var(--gold);font-size:12px;font-weight:700}.hero h1{font-size:clamp(27px,5vw,42px);margin:8px 0}.hero p{color:var(--muted);line-height:1.9;margin:0;max-width:700px}
+.layout{display:grid;grid-template-columns:1fr 330px;gap:18px}.panel{background:linear-gradient(145deg,#151f33,#0f1829);border:1px solid var(--line);border-radius:18px;padding:19px;margin-bottom:16px}.panel h2{font-size:17px;margin:0 0 12px}.hint{color:var(--muted);font-size:12px;line-height:1.8;margin:0 0 12px}
+textarea,input,select{font:inherit;color:var(--text);background:#091222;border:1px solid #34435e;border-radius:11px;padding:12px;width:100%;outline:none}textarea:focus,input:focus,select:focus{border-color:var(--violet)}#article{min-height:280px;resize:vertical;line-height:1.9}label{display:block;font-size:12px;color:#c9d2e3;margin:12px 0 7px}.row{display:flex;gap:10px}.row>*{flex:1;min-width:0}.btn{border:0;border-radius:11px;padding:12px 16px;font:inherit;font-weight:700;cursor:pointer}.primary{background:linear-gradient(120deg,#b8aaff,#788ce1);color:#10162b}.secondary{background:#202d46;color:#e8edfa;border:1px solid #3a4964}.gold{background:linear-gradient(120deg,#ffe18a,#dcae32);color:#2b2108}.btn:disabled{opacity:.45;cursor:not-allowed}.notice{background:#1e293d;border:1px solid #354560;border-radius:12px;padding:12px;color:#c3cee0;font-size:11px;line-height:1.8}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.slide{background:#101a2c;border:1px solid var(--line);border-radius:16px;overflow:hidden}.slide img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block;background:#091222}.slide-body{padding:13px}.slide-body input{margin-bottom:8px}.slide-body textarea{min-height:86px;font-size:12px;line-height:1.7;resize:vertical}.slide-actions{display:flex;gap:7px;margin-top:9px}.slide-actions button{flex:1;padding:9px 6px;font-size:11px}.empty{border:1px dashed #3a4964;border-radius:15px;padding:35px 15px;text-align:center;color:var(--muted);font-size:13px;grid-column:1/-1}.status{font-size:11px;color:var(--gold);min-height:20px;margin-top:8px}.check{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;margin:12px 0}.check input{width:auto}.progress{height:6px;background:#26334b;border-radius:20px;overflow:hidden;margin-top:10px}.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,#8b7be9,#f4cb58);transition:width .25s}.side .panel{position:sticky;top:14px}.small{font-size:10px;color:var(--muted);line-height:1.7}.hidden{display:none!important}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.side .panel{position:static}.cards{grid-template-columns:1fr 1fr}}@media(max-width:520px){header{padding:15px}.cards{grid-template-columns:1fr}.panel{padding:14px}.row{flex-direction:column}}
+</style>
+</head>
+<body>
+<header><div class="brand"><div class="mark">A</div><div><b>AI-ONE</b><small>استوديو تحويل المقالات إلى صور</small></div></div><a href="./index.html">العودة للمساعد ←</a></header>
+<main>
+<section class="hero"><div class="eyebrow">✦ أداة صناعة المحتوى البصري</div><h1>حوّل مقالك إلى سلسلة صور مرتبة</h1><p>الصق المقال، قسّمه إلى مشاهد، عدّل عناوين كل صورة ووصفها، ثم أنشئ الصور واحدة تلو الأخرى وحمّلها منفصلة.</p></section>
+<div class="layout">
+<section>
+<div class="panel"><h2>١. المقال الأصلي</h2><p class="hint">افصل بين الأجزاء بسطر فارغ أو اكتب عنوان كل جزء في سطر مستقل يبدأ بـ #. سيحاول الموقع الحفاظ على ترتيب النص.</p><textarea id="article" placeholder="الصق المقال هنا..."></textarea><div class="row" style="margin-top:10px"><button class="btn primary" id="split">قسّم المقال إلى صور</button><button class="btn secondary" id="sample">جرّب مثالاً</button></div><div class="status" id="splitStatus"></div></div>
+<div class="panel"><div class="row" style="align-items:center"><h2 style="margin:0">٢. الصور بالترتيب</h2><button class="btn secondary" id="downloadAll" disabled>تحميل الصور</button></div><p class="hint">عدّل العنوان والوصف قبل التوليد. كل بطاقة تمثل صورة مستقلة.</p><div class="cards" id="cards"><div class="empty">لم يتم تقسيم أي مقال بعد.</div></div></div>
+</section>
+<aside class="side">
+<div class="panel"><h2>٣. إعدادات التصميم</h2>
+<label for="style">الهوية البصرية</label><select id="style"><option value="dark cinematic editorial, deep navy and black background, gold yellow and red accents, dramatic studio lighting, premium Arabic social media infographic">سينمائي داكن — أزرق وذهبي وأحمر</option><option value="clean modern editorial infographic, warm ivory background, dark charcoal typography, muted gold accents">تحريري فاتح — عاجي وذهبي</option><option value="bold modern graphic poster, electric blue, white and orange, strong geometric shapes">جرافيك جريء — أزرق وبرتقالي</option></select>
+<label for="ratio">مقاس الصورة</label><select id="ratio"><option value="portrait">طولي 4:5 — منشورات</option><option value="square">مربع 1:1</option><option value="story">قصة 9:16</option></select>
+<label for="model">نموذج الصور</label><select id="model"><option value="black-forest-labs/flux.1-schnell">Flux Schnell</option><option value="tongyi-mai/z-image-turbo">Z Image Turbo</option></select>
+<label for="apiKey">مفتاح توليد الصور (Pollinations)</label><input id="apiKey" type="password" autocomplete="off" placeholder="أدخل مفتاحك sk_...">
+<p class="small">المفتاح يبقى في ذاكرة الصفحة فقط ولا يُحفظ في قاعدة البيانات. أنشئه من حسابك لدى Pollinations. التوليد يتطلب مفتاحاً وقد يستهلك رصيداً؛ لا يوجد ضمان لاستخدام غير محدود مجاناً.</p>
+<label class="check"><input type="checkbox" id="safe" checked> تجنّب العري والإيحاءات والمشاهد الخادشة</label>
+<button class="btn gold" id="generateAll" style="width:100%" disabled>✦ أنشئ كل الصور بالترتيب</button><div class="progress"><span id="progress"></span></div><div class="status" id="genStatus"></div>
+<div class="notice" style="margin-top:14px">مهم: مولّد الصور يرسم المشهد، لكنه قد لا يكتب العربية بدقة. لذلك العنوان والنص سيظهران في بطاقة الصورة ويمكنك إضافتهما لاحقاً في Canva أو أي محرر صور.</div>
+</div></aside></div></main>
+<script>
+const $=id=>document.getElementById(id);let slides=[];
+const samples=[
+["الغلاف","أرخص لحمة في العالم","غلاف رمزي عن اقتصاد المشاهدات على منصات التواصل: هاتف يعرض بثاً مباشراً وأرقام مشاهدة، عملات ذهبية وسهم صاعد، دون إظهار أجساد أو مشاهد خادشة."],
+["بورصة الرخص","الحكاية ماشية إزاي؟ بورصة الرخص","مشهد رمزي يشبه سوقاً مالياً: ثلاثة أعمدة مكتوب عليها البضاعة والبائع والزبون، هاتف صغير وحلقات إضاءة وكاميرا، دون أشخاص مكشوفين."],
+["المنصات والجمهور","السوق بيكافئ الأرخص","شاشة هاتف وأيقونات تفاعل وإعجابات وتعليقات تتحول إلى عملات، ومخطط مشاهدات يصعد بسرعة."],
+["الجوع للشهرة","طب ليه بيقعوا؟ عشان جعانين","شخص في هيئة ظل يجلس أمام هاتف في غرفة بسيطة، بجواره ساعة وعملات ورمز فرصة ضائعة، مشهد إنساني غير مهين."],
+["التعود","الأخطر من الجوع هو التعود","هاتف تحيط به حلقة متكررة من الإشعارات، عداد تفاعل يدور كآلة، وألوان تتدرج من الهدوء إلى الضغط."],
+["الفاتورة","الفاتورة... وبتبقى غالية","ميزان مائل يحمل هاتفاً وعملاً ذهبية في كفة، وفي الأخرى رموز الخصوصية والثقة والعائلة والوقت."],
+["الجيل القادم","بنبوّظ جيل كامل","طفل من الخلف ينظر إلى شاشة هاتف كبيرة، وخلفه كتب ومدرسة وألعاب باهتة، رمزية لتأثير القدوة على الأجيال."],
+["الخلاصة","مش ضحية لوحده ولا مجرم لوحده","ثلاثة عناصر متصلة: منصة رقمية، جمهور، وأبواب فرص عمل مغلقة، وفي المنتصف ميزان للقيم والكرامة."]
+];
+function clean(s){return s.replace(/^#+\s*/,'').replace(/^\s*\d+[.)-]\s*/,'').trim()}
+function splitArticle(){
+ const raw=$('article').value.trim();if(!raw){$('splitStatus').textContent='الصق المقال أولاً.';return}
+ let parts=raw.split(/\n\s*\n+/).map(clean).filter(Boolean);
+ if(parts.length<2)parts=raw.split(/(?=^\s*#{1,3}\s+|^\s*\d+[.)-]\s+)/m).map(clean).filter(Boolean);
+ if(parts.length<2){$('splitStatus').textContent='لم أجد فواصل كافية؛ أضف سطراً فارغاً بين كل جزء أو استخدم # قبل العناوين.';return}
+ const max=12;slides=parts.slice(0,max).map((p,i)=>{let lines=p.split(/[.!؟\n]/).map(x=>x.trim()).filter(Boolean);let title=(lines[0]||('الصورة '+(i+1))).slice(0,70);return {title,body:p,prompt:visualPrompt(p),url:null,busy:false}});
+ render();$('splitStatus').textContent='تم تقسيم المقال إلى '+slides.length+' أجزاء مرتبة.';$('generateAll').disabled=false;
+}
+function visualPrompt(body){return 'Create one polished Arabic social media editorial illustration. Visual subject based on this content: '+body.slice(0,900)+'. '+$('style').value+'. No readable text, no letters, no watermarks, no logos. Strong clear central metaphor, coherent composition, professional high-end infographic photography, crisp details. '+($('safe').checked?'Absolutely no nudity, no lingerie, no sexualized posing, no explicit content. Use symbolic objects and fully clothed silhouettes only.':'')}
+function render(){
+ const root=$('cards');root.innerHTML='';
+ slides.forEach((s,i)=>{const card=document.createElement('article');card.className='slide';const img=document.createElement('img');img.alt='معاينة الصورة '+(i+1);if(s.url)img.src=s.url;else img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="750"><rect width="100%" height="100%" fill="#0b1424"/><text x="50%" y="48%" fill="#b6a9ff" font-size="30" text-anchor="middle" font-family="Arial">الصورة '+(i+1)+'</text><text x="50%" y="55%" fill="#91a0ba" font-size="18" text-anchor="middle" font-family="Arial">بانتظار التوليد</text></svg>');
+ const body=document.createElement('div');body.className='slide-body';const title=document.createElement('input');title.value=s.title;title.setAttribute('aria-label','عنوان الصورة');title.addEventListener('input',()=>s.title=title.value);const desc=document.createElement('textarea');desc.value=s.prompt;desc.setAttribute('aria-label','وصف الصورة');desc.addEventListener('input',()=>s.prompt=desc.value);const actions=document.createElement('div');actions.className='slide-actions';const gen=document.createElement('button');gen.className='btn primary';gen.textContent=s.url?'إعادة التوليد':'أنشئ الصورة';gen.addEventListener('click',()=>generateOne(i));const dl=document.createElement('button');dl.className='btn secondary';dl.textContent='تحميل';dl.disabled=!s.url;dl.addEventListener('click',()=>download(i));actions.append(gen,dl);body.append(title,desc,actions);card.append(img,body);root.append(card);});
+ $('downloadAll').disabled=!slides.some(s=>s.url);
+}
+function dimensions(){const r=$('ratio').value;return r==='square'?[1024,1024]:r==='story'?[768,1365]:[1024,1280]}
+async function generateOne(i){const s=slides[i],key=$('apiKey').value.trim();if(!key){$('genStatus').textContent='أدخل مفتاح Pollinations أولاً.';return}if(s.busy)return;s.busy=true;$('genStatus').textContent='جارٍ إنشاء الصورة '+(i+1)+' من '+slides.length+'...';render();try{const [w,h]=dimensions();const prompt=s.prompt+' Aspect ratio '+w+':'+h+'.';const url='https://gen.pollinations.ai/image/'+encodeURIComponent(prompt)+'?model='+encodeURIComponent($('model').value)+'&width='+w+'&height='+h+'&nologo=true';const res=await fetch(url,{headers:{Authorization:'Bearer '+key}});if(!res.ok){let msg='HTTP '+res.status;try{const j=await res.json();msg=j.error||j.message||msg}catch{}throw new Error(msg)}const blob=await res.blob();if(!blob.type.startsWith('image/'))throw new Error('لم يرجع مزود الصور ملف صورة.');s.url=URL.createObjectURL(blob);$('genStatus').textContent='اكتملت الصورة '+(i+1)+'.';}catch(e){$('genStatus').textContent='تعذر إنشاء الصورة '+(i+1)+': '+e.message+'. تحقق من المفتاح والرصيد.';}finally{s.busy=false;render()}}
+async function generateAll(){for(let i=0;i<slides.length;i++){if(!slides[i].url)await generateOne(i);$('progress').style.width=Math.round((i+1)/slides.length*100)+'%';if(!slides[i].url)break;}const done=slides.filter(s=>s.url).length;$('genStatus').textContent='اكتمل '+done+' من '+slides.length+' صور.'}
+function download(i){const a=document.createElement('a');a.href=slides[i].url;a.download='article-image-'+String(i+1).padStart(2,'0')+'.jpg';document.body.append(a);a.click();a.remove()}
+$('split').addEventListener('click',splitArticle);$('sample').addEventListener('click',()=>{$('article').value=samples.map((s,i)=>'# '+s[1]+'\n'+s[2]).join('\n\n');splitArticle()});$('generateAll').addEventListener('click',generateAll);$('downloadAll').addEventListener('click',()=>slides.forEach((s,i)=>{if(s.url)setTimeout(()=>download(i),i*350)}));$('style').addEventListener('change',()=>slides.forEach(s=>s.prompt=visualPrompt(s.body)));$('safe').addEventListener('change',()=>slides.forEach(s=>s.prompt=visualPrompt(s.body)));$('apiKey').addEventListener('input',()=>{$('generateAll').disabled=!slides.length||!$('apiKey').value.trim()});$('ratio').addEventListener('change',()=>{});$('split').addEventListener('click',()=>{$('generateAll').disabled=!slides.length||!$('apiKey').value.trim()});
+</script>
+</body></html>
