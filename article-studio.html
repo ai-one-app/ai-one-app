@@ -29,14 +29,37 @@ textarea,input,select{font:inherit;color:var(--text);background:#091222;border:1
 <label for="style">الهوية البصرية</label><select id="style"><option value="dark cinematic editorial, deep navy and black background, gold yellow and red accents, dramatic studio lighting, premium Arabic social media infographic">سينمائي داكن — أزرق وذهبي وأحمر</option><option value="clean modern editorial infographic, warm ivory background, dark charcoal typography, muted gold accents">تحريري فاتح — عاجي وذهبي</option><option value="bold modern graphic poster, electric blue, white and orange, strong geometric shapes">جرافيك جريء — أزرق وبرتقالي</option></select>
 <label for="ratio">مقاس الصورة</label><select id="ratio"><option value="portrait">طولي 4:5 — منشورات</option><option value="square">مربع 1:1</option><option value="story">قصة 9:16</option></select>
 <label for="model">نموذج الصور</label><select id="model"><option value="black-forest-labs/flux.1-schnell">Flux Schnell</option><option value="tongyi-mai/z-image-turbo">Z Image Turbo</option></select>
-<label for="apiKey">مفتاح توليد الصور (Pollinations)</label><input id="apiKey" type="password" autocomplete="off" placeholder="أدخل مفتاحك sk_...">
-<p class="small">المفتاح يبقى في ذاكرة الصفحة فقط ولا يُحفظ في قاعدة البيانات. أنشئه من حسابك لدى Pollinations. التوليد يتطلب مفتاحاً وقد يستهلك رصيداً؛ لا يوجد ضمان لاستخدام غير محدود مجاناً.</p>
+<label>ربط حساب Pollinations</label><button class="btn secondary" id="connectPollinations" style="width:100%">🔐 ربط حسابي لتوليد الصور</button><button class="btn secondary hidden" id="disconnectPollinations" style="width:100%;margin-top:8px">فصل الحساب</button>
+<p class="small">سيتم تحويلك إلى Pollinations للموافقة على استخدام رصيدك. المفتاح المؤقت يبقى في ذاكرة جلسة المتصفح ولا يُحفظ في الموقع. قد يستهلك التوليد رصيداً وفق ميزانية الموافقة.</p>
 <label class="check"><input type="checkbox" id="safe" checked> تجنّب العري والإيحاءات والمشاهد الخادشة</label>
 <button class="btn gold" id="generateAll" style="width:100%" disabled>✦ أنشئ كل الصور بالترتيب</button><div class="progress"><span id="progress"></span></div><div class="status" id="genStatus"></div>
 <div class="notice" style="margin-top:14px">مهم: مولّد الصور يرسم المشهد، لكنه قد لا يكتب العربية بدقة. لذلك العنوان والنص سيظهران في بطاقة الصورة ويمكنك إضافتهما لاحقاً في Canva أو أي محرر صور.</div>
 </div></aside></div></main>
 <script>
 const $=id=>document.getElementById(id);let slides=[];
+const POLLINATIONS_APP_KEY='pk_EDn5OVAUvDpuFlWT';
+const POLLINATIONS_REDIRECT='https://ai-one-app.github.io/ai-one-app/pollinations-callback.html';
+function updatePollinationsUI(){
+ const token=sessionStorage.getItem('pollinations_access_token');
+ $('connectPollinations').classList.toggle('hidden',!!token);
+ $('disconnectPollinations').classList.toggle('hidden',!token);
+ $('generateAll').disabled=!slides.length||!token;
+ if(token)$('genStatus').textContent='حساب Pollinations متصل وجاهز للتوليد.';
+}
+function b64url(bytes){return btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'')}
+async function connectPollinations(){
+ try{
+  const bytes=crypto.getRandomValues(new Uint8Array(48));
+  const verifier=b64url(bytes);
+  const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(verifier));
+  const challenge=b64url(digest);
+  const state=b64url(crypto.getRandomValues(new Uint8Array(24)));
+  sessionStorage.setItem('pollinations_pkce_verifier',verifier);
+  sessionStorage.setItem('pollinations_oauth_state',state);
+  const p=new URLSearchParams({response_type:'code',client_id:POLLINATIONS_APP_KEY,redirect_uri:POLLINATIONS_REDIRECT,scope:'profile usage',models:'image',expiry:'7',state,code_challenge:challenge,code_challenge_method:'S256'});
+  location.href='https://enter.pollinations.ai/authorize?'+p.toString();
+ }catch(e){$('genStatus').textContent='تعذر بدء الربط: '+e.message}
+}
 const samples=[
 ["الغلاف","أرخص لحمة في العالم","غلاف رمزي عن اقتصاد المشاهدات على منصات التواصل: هاتف يعرض بثاً مباشراً وأرقام مشاهدة، عملات ذهبية وسهم صاعد، دون إظهار أجساد أو مشاهد خادشة."],
 ["بورصة الرخص","الحكاية ماشية إزاي؟ بورصة الرخص","مشهد رمزي يشبه سوقاً مالياً: ثلاثة أعمدة مكتوب عليها البضاعة والبائع والزبون، هاتف صغير وحلقات إضاءة وكاميرا، دون أشخاص مكشوفين."],
@@ -64,7 +87,7 @@ function render(){
  $('downloadAll').disabled=!slides.some(s=>s.url);
 }
 function dimensions(){const r=$('ratio').value;return r==='square'?[1024,1024]:r==='story'?[768,1365]:[1024,1280]}
-async function generateOne(i){const s=slides[i],key=$('apiKey').value.trim();if(!key){$('genStatus').textContent='أدخل مفتاح Pollinations أولاً.';return}if(s.busy)return;s.busy=true;$('genStatus').textContent='جارٍ إنشاء الصورة '+(i+1)+' من '+slides.length+'...';render();try{const [w,h]=dimensions();const prompt=s.prompt+' Aspect ratio '+w+':'+h+'.';const url='https://gen.pollinations.ai/image/'+encodeURIComponent(prompt)+'?model='+encodeURIComponent($('model').value)+'&width='+w+'&height='+h+'&nologo=true';const res=await fetch(url,{headers:{Authorization:'Bearer '+key}});if(!res.ok){let msg='HTTP '+res.status;try{const j=await res.json();msg=j.error||j.message||msg}catch{}throw new Error(msg)}const blob=await res.blob();if(!blob.type.startsWith('image/'))throw new Error('لم يرجع مزود الصور ملف صورة.');s.url=URL.createObjectURL(blob);$('genStatus').textContent='اكتملت الصورة '+(i+1)+'.';}catch(e){$('genStatus').textContent='تعذر إنشاء الصورة '+(i+1)+': '+e.message+'. تحقق من المفتاح والرصيد.';}finally{s.busy=false;render()}}
+async function generateOne(i){const s=slides[i],key=sessionStorage.getItem('pollinations_access_token');if(!key){$('genStatus').textContent='اربط حساب Pollinations أولاً.';return}if(s.busy)return;s.busy=true;$('genStatus').textContent='جارٍ إنشاء الصورة '+(i+1)+' من '+slides.length+'...';render();try{const [w,h]=dimensions();const prompt=s.prompt+' Aspect ratio '+w+':'+h+'.';const url='https://gen.pollinations.ai/image/'+encodeURIComponent(prompt)+'?model='+encodeURIComponent($('model').value)+'&width='+w+'&height='+h+'&nologo=true';const res=await fetch(url,{headers:{Authorization:'Bearer '+key}});if(!res.ok){let msg='HTTP '+res.status;try{const j=await res.json();msg=j.error||j.message||msg}catch{}throw new Error(msg)}const blob=await res.blob();if(!blob.type.startsWith('image/'))throw new Error('لم يرجع مزود الصور ملف صورة.');s.url=URL.createObjectURL(blob);$('genStatus').textContent='اكتملت الصورة '+(i+1)+'.';}catch(e){$('genStatus').textContent='تعذر إنشاء الصورة '+(i+1)+': '+e.message+'. تحقق من المفتاح والرصيد.';}finally{s.busy=false;render()}}
 async function generateAll(){for(let i=0;i<slides.length;i++){if(!slides[i].url)await generateOne(i);$('progress').style.width=Math.round((i+1)/slides.length*100)+'%';if(!slides[i].url)break;}const done=slides.filter(s=>s.url).length;$('genStatus').textContent='اكتمل '+done+' من '+slides.length+' صور.'}
 async function download(i){
  const s=slides[i];if(!s.url)return;
@@ -79,6 +102,6 @@ async function download(i){
   canvas.toBlob(blob=>{if(!blob){$('genStatus').textContent='تعذر تجهيز ملف التحميل.';return}const a=document.createElement('a');const u=URL.createObjectURL(blob);a.href=u;a.download='article-image-'+String(i+1).padStart(2,'0')+'.png';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),3000)},'image/png');
  };img.onerror=()=>$('genStatus').textContent='تعذر تجهيز الصورة للتحميل.';img.src=s.url;
 }
-$('split').addEventListener('click',splitArticle);$('sample').addEventListener('click',()=>{$('article').value=samples.map((s,i)=>'# '+s[1]+'\n'+s[2]).join('\n\n');splitArticle()});$('generateAll').addEventListener('click',generateAll);$('downloadAll').addEventListener('click',()=>slides.forEach((s,i)=>{if(s.url)setTimeout(()=>download(i),i*350)}));$('style').addEventListener('change',()=>slides.forEach(s=>s.prompt=visualPrompt(s.body)));$('safe').addEventListener('change',()=>slides.forEach(s=>s.prompt=visualPrompt(s.body)));$('apiKey').addEventListener('input',()=>{$('generateAll').disabled=!slides.length||!$('apiKey').value.trim()});$('ratio').addEventListener('change',()=>{});$('split').addEventListener('click',()=>{$('generateAll').disabled=!slides.length||!$('apiKey').value.trim()});
+$('split').addEventListener('click',splitArticle);$('sample').addEventListener('click',()=>{$('article').value=samples.map((s,i)=>'# '+s[1]+'\n'+s[2]).join('\n\n');splitArticle()});$('generateAll').addEventListener('click',generateAll);$('downloadAll').addEventListener('click',()=>slides.forEach((s,i)=>{if(s.url)setTimeout(()=>download(i),i*350)}));$('style').addEventListener('change',()=>slides.forEach(s=>s.prompt=visualPrompt(s.body)));$('safe').addEventListener('change',()=>slides.forEach(s=>s.prompt=visualPrompt(s.body)));$('connectPollinations').addEventListener('click',connectPollinations);$('disconnectPollinations').addEventListener('click',()=>{sessionStorage.removeItem('pollinations_access_token');updatePollinationsUI()});$('ratio').addEventListener('change',()=>{});$('split').addEventListener('click',()=>{$('generateAll').disabled=!slides.length||!sessionStorage.getItem('pollinations_access_token')});updatePollinationsUI();
 </script>
 </body></html>
