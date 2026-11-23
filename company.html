@@ -53,7 +53,7 @@ a{color:#c8c0ff;text-decoration:none}main{width:min(1180px,calc(100% - 28px));ma
 <div class="full"><label for="taskDescription">تفاصيل المهمة</label><textarea id="taskDescription" placeholder="اكتب المطلوب والهدف وأي تفاصيل تساعد الموظف..."></textarea></div>
 </div>
 <label class="check"><input id="approvalRequired" type="checkbox" checked> تتطلب المهمة موافقتي قبل اعتماد النتيجة</label>
-<div class="actions"><button class="btn primary" id="createTask">إسناد المهمة</button><span class="muted" id="formStatus"></span></div>
+<div class="actions"><button class="btn primary" id="createTask" type="button" onclick="if(window.aiOneCreateTask){window.aiOneCreateTask()}else{document.getElementById('formStatus').textContent='تعذر تشغيل صفحة الشركة. حدّث الصفحة، وإذا استمرت المشكلة أرسل لنا صورة الشاشة.'}">إسناد المهمة</button><span class="muted" id="formStatus" role="status" aria-live="polite"></span></div>
 </section>
 <section class="panel"><h2>لوحة المهام</h2><div id="taskList" class="task-list"><div class="empty">جارٍ تحميل المهام...</div></div></section>
 <div id="loginNotice" class="panel hidden"><h2>سجّل الدخول أولاً</h2><p class="muted">استخدم نفس حساب AI-ONE لفتح مكتب الشركة وحفظ المهام بأمان.</p><a class="btn primary" href="./index.html">الذهاب لتسجيل الدخول</a></div>
@@ -86,8 +86,8 @@ function renderTasks(){const root=$("taskList");root.innerHTML="";if(!tasks.leng
  if(task.result&&["approved","completed","rejected"].includes(task.status)){const again=document.createElement("button");again.className="btn secondary";again.textContent="إعادة فتح";again.addEventListener("click",()=>setTaskStatus(task,"queued"));actions.append(again)}
  const del=document.createElement("button");del.className="btn secondary";del.textContent="حذف";del.addEventListener("click",()=>deleteTask(task));actions.append(del);card.append(actions);root.append(card)}
 }
-async function createTask(){const employee=employees[$("employee").value],title=$("taskTitle").value.trim(),description=$("taskDescription").value.trim();if(!title||!description){$("formStatus").textContent="اكتب عنوان المهمة وتفاصيلها.";return}
- $("createTask").disabled=true;$("formStatus").textContent="جارٍ حفظ المهمة...";const {error}=await supabase.from("company_tasks").insert({user_id:user.id,department:employee.department,employee_id:$("employee").value,title,description,priority:$("priority").value,requires_approval:$("approvalRequired").checked});$("createTask").disabled=false;if(error){$("formStatus").textContent="تعذر الحفظ: "+error.message;return}$("taskTitle").value="";$("taskDescription").value="";$("formStatus").textContent="تم إسناد المهمة.";await loadTasks()}
+async function createTask(){const employee=employees[$("employee").value],title=$("taskTitle").value.trim(),description=$("taskDescription").value.trim();if(!user){$("formStatus").textContent="انتهت جلسة الدخول. ارجع للصفحة الرئيسية وسجّل الدخول مرة أخرى.";return}if(!title||!description){$("formStatus").textContent="اكتب عنوان المهمة وتفاصيلها قبل الإسناد.";return}
+ $("createTask").disabled=true;$("formStatus").textContent="جارٍ حفظ المهمة...";try{const {data,error}=await supabase.from("company_tasks").insert({user_id:user.id,department:employee.department,employee_id:$("employee").value,title,description,priority:$("priority").value,requires_approval:$("approvalRequired").checked}).select("id").single();if(error)throw error;if(!data?.id)throw new Error("لم يؤكد النظام حفظ المهمة.");$("taskTitle").value="";$("taskDescription").value="";$("formStatus").textContent="تم إسناد المهمة بنجاح. جارٍ تحديث قائمة المهام...";await loadTasks();$("formStatus").textContent="تم إسناد المهمة بنجاح."}catch(error){$("formStatus").textContent="تعذر إسناد المهمة: "+(error?.message||String(error))}finally{$("createTask").disabled=false}}
 async function runTask(task){const {error:updateError}=await supabase.from("company_tasks").update({status:"working",error_message:null}).eq("id",task.id);if(updateError){alert(updateError.message);return}await loadTasks();const employee=employees[task.employee_id];try{const prompt=employee.prompt+"\n\nعنوان المهمة: "+task.title+"\nتفاصيل المهمة: "+task.description+"\nالأولوية: "+task.priority+"\n\nنفذ التحليل أو إعداد المسودة المطلوبة. أخرج نتيجة عملية ومنظمة باللغة العربية. إذا كانت هناك معلومات ناقصة فاذكرها بوضوح.";
  const {data,error}=await supabase.functions.invoke("ai-router",{body:{messages:[{role:"user",content:prompt}]}});
  if(error)throw error;if(data?.error)throw new Error(data.error+(data.details?.length?" — "+data.details.join(" | "):""));const result=typeof data?.text==="string"?data.text:"لم يصل رد نصي من النموذج.";
@@ -95,7 +95,7 @@ async function runTask(task){const {error:updateError}=await supabase.from("comp
  }catch(e){await supabase.from("company_tasks").update({status:"failed",error_message:String(e?.message||e)}).eq("id",task.id);alert("تعذر تنفيذ المهمة: "+(e?.message||"خطأ غير معروف"))}await loadTasks()}
 async function setTaskStatus(task,status){const {error}=await supabase.from("company_tasks").update({status}).eq("id",task.id);if(error){alert(error.message);return}await loadTasks()}
 async function deleteTask(task){if(!confirm("هل تريد حذف هذه المهمة؟"))return;const {error}=await supabase.from("company_tasks").delete().eq("id",task.id);if(error){alert(error.message);return}await loadTasks()}
-$("createTask").addEventListener("click",createTask);
+window.aiOneCreateTask=createTask;
 const {data:{session}}=await supabase.auth.getSession();user=session?.user||null;
 if(!user){$("loginNotice").classList.remove("hidden");$("taskList").innerHTML='<div class="empty">سجّل الدخول من الصفحة الرئيسية أولاً.</div>';$("createTask").disabled=true}else{await loadTasks()}
 </script>
