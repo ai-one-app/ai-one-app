@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090e1b"><meta name="description" content="AI-ONE Company — فريقك الافتراضي من موظفي الذكاء الاصطناعي">
+<title>AI-ONE Company | شركتك الافتراضية</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&display=swap');
+:root{color-scheme:dark;--bg:#090e1b;--panel:#111b2d;--line:#293750;--text:#f3f6ff;--muted:#95a3bb;--gold:#e7bd62;--violet:#a99aff;--green:#68d7b2;--red:#e77979}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% 0,#27365a55,transparent 38%),var(--bg);color:var(--text);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;min-height:100vh}
+header{padding:18px max(16px,calc((100vw - 1180px)/2));border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;background:#0b1322dd}
+.brand{display:flex;align-items:center;gap:11px}.mark{width:43px;height:43px;border-radius:14px;background:linear-gradient(140deg,#f3d58a,#9d7d3c);display:grid;place-items:center;color:#171525;font-weight:800;font-size:23px}.brand b{display:block;letter-spacing:1px}.brand small{display:block;color:var(--muted);font-size:11px}
+a{color:#c8c0ff;text-decoration:none}main{width:min(1180px,calc(100% - 28px));margin:26px auto 70px}
+.hero{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin:10px 0 23px}.eyebrow{color:var(--gold);font-size:12px;font-weight:700}.hero h1{font-size:clamp(26px,5vw,39px);margin:7px 0}.hero p{color:var(--muted);line-height:1.9;margin:0;max-width:680px;font-size:13px}
+.panel{background:linear-gradient(145deg,#151f33,#0f1829);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px}.panel h2{font-size:17px;margin:0 0 13px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:17px}.stat{background:#101a2b;border:1px solid var(--line);border-radius:15px;padding:14px}.stat b{display:block;font-size:25px;color:var(--gold)}.stat span{color:var(--muted);font-size:11px}
+.employees{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}.employee{border:1px solid var(--line);background:#101a2b;border-radius:15px;padding:14px;min-width:0}.employee .ico{font-size:24px}.employee b{display:block;font-size:13px;margin:7px 0 3px}.employee small{display:block;color:var(--muted);font-size:10px;line-height:1.7}.tag{display:inline-block;margin-top:8px;padding:4px 8px;border-radius:20px;background:#26324a;color:#d8dff0;font-size:9px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}label{display:block;color:#c8d1e2;font-size:11px;margin:0 0 6px}input,select,textarea{font:inherit;color:var(--text);background:#091222;border:1px solid #34435e;border-radius:11px;padding:11px;width:100%;outline:none}textarea{min-height:95px;resize:vertical;line-height:1.8}input:focus,select:focus,textarea:focus{border-color:var(--violet)}.full{grid-column:1/-1}
+.check{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:11px;margin:12px 0}.check input{width:auto}
+.btn{border:0;border-radius:11px;padding:11px 16px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}.primary{background:linear-gradient(120deg,#f0d38b,#c69b4b);color:#241b0b}.secondary{background:#202d46;color:#e8edfa;border:1px solid #3a4964}.danger{background:#47252d;color:#ffd7d7;border:1px solid #70404a}.btn:disabled{opacity:.45;cursor:not-allowed}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.task-list{display:flex;flex-direction:column;gap:10px}.task{border:1px solid var(--line);background:#101a2b;border-radius:14px;padding:14px}.task-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.task h3{font-size:14px;margin:0 0 5px}.task p{color:var(--muted);font-size:11px;line-height:1.8;margin:0;white-space:pre-wrap;overflow-wrap:anywhere}.status{font-size:10px;border-radius:20px;padding:5px 9px;background:#26324a;white-space:nowrap}.status.working{color:#ffe29b;background:#493b20}.status.awaiting_approval{color:#ffe29b;background:#493b20}.status.completed,.status.approved{color:#a7f0d4;background:#163d35}.status.failed,.status.rejected{color:#ffc0c0;background:#48272d}
+.result{margin-top:12px;padding:12px;border-radius:11px;background:#0b1424;border:1px solid #2b3a54;font-size:12px;line-height:1.9;white-space:pre-wrap;overflow-wrap:anywhere}
+.muted{color:var(--muted);font-size:11px;line-height:1.8}.notice{padding:12px;border:1px solid #65512d;background:#332a1a;border-radius:12px;color:#f0d9a5;font-size:11px;line-height:1.8;margin-bottom:14px}
+.empty{border:1px dashed #3a4964;border-radius:14px;padding:24px;text-align:center;color:var(--muted);font-size:12px}.hidden{display:none!important}
+@media(max-width:850px){.employees{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{display:block}.stats{gap:8px}.stat{padding:11px}}
+@media(max-width:520px){header{padding:14px}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.employees{grid-template-columns:1fr 1fr}.task-top{display:block}.status{display:inline-block;margin-top:8px}.panel{padding:14px}}
+</style>
+</head>
+<body>
+<header><div class="brand"><div class="mark">A</div><div><b>AI-ONE COMPANY</b><small>شركتك الافتراضية بالذكاء الاصطناعي</small></div></div><a href="./index.html">← العودة إلى AI-ONE</a></header>
+<main>
+<section class="hero"><div><div class="eyebrow">✦ مكتبك الإداري الذكي</div><h1>أهلاً بك في شركتك</h1><p>كل موظف له تخصص ومهام واضحة. الموظفون يجهزون الأعمال الروتينية، وأنت تعتمد النتائج والقرارات المهمة قبل تنفيذها.</p></div></section>
+<div class="notice">نسخة التأسيس: الموظفون يستطيعون إعداد الخطط والمسودات والتقارير. لا يتم إرسال بريد أو نشر إعلان أو تنفيذ إجراء خارجي تلقائياً. هذه الإجراءات تحتاج ربط الخدمات وموافقتك.</div>
+<section class="stats">
+<div class="stat"><b id="totalTasks">—</b><span>إجمالي المهام</span></div>
+<div class="stat"><b id="pendingTasks">—</b><span>بانتظار موافقتك</span></div>
+<div class="stat"><b id="doneTasks">—</b><span>مهام معتمدة أو مكتملة</span></div>
+</section>
+<section class="panel"><h2>مجلس الإدارة والفريق</h2><div class="employees">
+<div class="employee"><div class="ico">👑</div><b>المدير التنفيذي</b><small>يرتب الأولويات ويضع خطط العمل ويرفع التقارير للرئيس.</small><span class="tag">الإدارة العليا</span></div>
+<div class="employee"><div class="ico">👥</div><b>مسؤول الموارد البشرية</b><small>الوصف الوظيفي، فرز السير الذاتية، أسئلة المقابلات وخطط التوظيف.</small><span class="tag">HR</span></div>
+<div class="employee"><div class="ico">📣</div><b>مدير التسويق</b><small>دراسة الجمهور، الحملات، المحتوى والأفكار الإعلانية.</small><span class="tag">Marketing</span></div>
+<div class="employee"><div class="ico">✉️</div><b>مسؤول الإيميلات</b><small>صياغة الرسائل والردود وتصنيفها. قراءة صندوق البريد تحتاج ربط Gmail لاحقاً.</small><span class="tag">Email</span></div>
+<div class="employee"><div class="ico">📊</div><b>المحلل المالي</b><small>تنظيم الميزانيات والحسابات التقديرية والتقارير المالية.</small><span class="tag">Finance</span></div>
+<div class="employee"><div class="ico">🤝</div><b>مدير المبيعات</b><small>خطط البيع ومتابعة العملاء والاعتراضات.</small><span class="tag">Sales</span></div>
+<div class="employee"><div class="ico">🎧</div><b>خدمة العملاء</b><small>الردود المقترحة وإدارة الشكاوى وسيناريوهات الدعم.</small><span class="tag">Support</span></div>
+<div class="employee"><div class="ico">🔎</div><b>باحث السوق</b><small>تحليل المنافسين والفرص والأسعار عند تزويده بالمعلومات.</small><span class="tag">Research</span></div>
+</div></section>
+<section class="panel"><h2>إسناد مهمة إلى موظف</h2><div class="form-grid">
+<div><label for="employee">اختر الموظف</label><select id="employee"><option value="ceo">المدير التنفيذي</option><option value="hr">مسؤول الموارد البشرية</option><option value="marketing">مدير التسويق</option><option value="email">مسؤول الإيميلات</option><option value="finance">المحلل المالي</option><option value="sales">مدير المبيعات</option><option value="support">خدمة العملاء</option><option value="research">باحث السوق</option></select></div>
+<div><label for="priority">الأولوية</label><select id="priority"><option value="normal">عادية</option><option value="high">مرتفعة</option><option value="urgent">عاجلة</option><option value="low">منخفضة</option></select></div>
+<div class="full"><label for="taskTitle">عنوان المهمة</label><input id="taskTitle" maxlength="180" placeholder="مثال: إعداد خطة تسويق لمنتج جديد"></div>
+<div class="full"><label for="taskDescription">تفاصيل المهمة</label><textarea id="taskDescription" placeholder="اكتب المطلوب والهدف وأي تفاصيل تساعد الموظف..."></textarea></div>
+</div>
+<label class="check"><input id="approvalRequired" type="checkbox" checked> تتطلب المهمة موافقتي قبل اعتماد النتيجة</label>
+<div class="actions"><button class="btn primary" id="createTask">إسناد المهمة</button><span class="muted" id="formStatus"></span></div>
+</section>
+<section class="panel"><h2>لوحة المهام</h2><div id="taskList" class="task-list"><div class="empty">جارٍ تحميل المهام...</div></div></section>
+<div id="loginNotice" class="panel hidden"><h2>سجّل الدخول أولاً</h2><p class="muted">استخدم نفس حساب AI-ONE لفتح مكتب الشركة وحفظ المهام بأمان.</p><a class="btn primary" href="./index.html">الذهاب لتسجيل الدخول</a></div>
+</main>
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
+const supabase=createClient("https://ccizidvgbuqhjjmvncvv.supabase.co","sb_publishable_f2bGVyttaHar4NYbv6r04A_97joyQdM");
+const $=id=>document.getElementById(id);
+const employees={
+ ceo:{name:"المدير التنفيذي",department:"executive",prompt:"أنت المدير التنفيذي في شركة افتراضية. حلل المطلوب، رتب الأولويات، واقترح خطة تنفيذ عملية بمراحل ومسؤوليات ومخاطر. لا تدّع أنك نفذت أي إجراء خارجي."},
+ hr:{name:"مسؤول الموارد البشرية",department:"hr",prompt:"أنت مسؤول موارد بشرية محترف. أعد أو حلل أوصاف الوظائف والسير الذاتية وأسئلة المقابلات وخطط التوظيف. لا تتخذ قرارات توظيف نهائية ولا تخترع بيانات مرشحين."},
+ marketing:{name:"مدير التسويق",department:"marketing",prompt:"أنت مدير تسويق محترف. حلل الجمهور والمنتج، واقترح استراتيجية وحملة ومحتوى ومؤشرات قياس. لا تدّع نشر إعلان أو إنفاق ميزانية."},
+ email:{name:"مسؤول الإيميلات",department:"email",prompt:"أنت مسؤول مراسلات الشركات. صغ رسائل وردوداً مهنية، لخص أي نص بريد يقدمه المستخدم، واقترح الأولوية والمتابعة. لا تدّع أنك قرأت صندوق بريد أو أرسلت رسالة."},
+ finance:{name:"المحلل المالي",department:"finance",prompt:"أنت محلل مالي إداري. نظم الأرقام والميزانيات والتوقعات، اذكر افتراضاتك بوضوح، ولا تقدم أرقاماً غير موجودة كحقائق."},
+ sales:{name:"مدير المبيعات",department:"sales",prompt:"أنت مدير مبيعات. ضع خطط البيع والمتابعة والاعتراضات ونصوص التواصل ومؤشرات الأداء. لا تدّع أنك تواصلت مع عميل."},
+ support:{name:"موظف خدمة العملاء",department:"support",prompt:"أنت موظف خدمة عملاء محترف. جهز ردوداً مهذبة وحلولاً وخطوات تصعيد للشكاوى. لا تعد العميل بشيء غير مؤكد."},
+ research:{name:"باحث السوق",department:"research",prompt:"أنت باحث سوق. حلل المعلومات التي يقدمها المستخدم، وميز بين الحقائق والافتراضات، وحدد البيانات الناقصة قبل إصدار استنتاجات."}
+};
+let user=null,tasks=[];
+function escapeText(v){return String(v??"")}
+function statusLabel(s){return ({queued:"في الانتظار",working:"قيد التنفيذ",awaiting_approval:"بانتظار موافقتك",approved:"تمت الموافقة",rejected:"مرفوضة",completed:"مكتملة",failed:"تعذّر التنفيذ"})[s]||s}
+function updateStats(){ $("totalTasks").textContent=tasks.length;$("pendingTasks").textContent=tasks.filter(t=>t.status==="awaiting_approval").length;$("doneTasks").textContent=tasks.filter(t=>["approved","completed"].includes(t.status)).length}
+async function loadTasks(){const {data,error}=await supabase.from("company_tasks").select("*").order("created_at",{ascending:false}).limit(100);if(error){$("taskList").innerHTML='<div class="empty">تعذر تحميل المهام: '+escapeText(error.message)+'</div>';return}tasks=data||[];updateStats();renderTasks()}
+function renderTasks(){const root=$("taskList");root.innerHTML="";if(!tasks.length){root.innerHTML='<div class="empty">لا توجد مهام بعد. ابدأ بإسناد أول مهمة لفريقك.</div>';return}
+ for(const task of tasks){const card=document.createElement("article");card.className="task";const top=document.createElement("div");top.className="task-top";const info=document.createElement("div");const h=document.createElement("h3");h.textContent=task.title;const p=document.createElement("p");p.textContent=employees[task.employee_id]?.name+" · "+task.description;info.append(h,p);const badge=document.createElement("span");badge.className="status "+task.status;badge.textContent=statusLabel(task.status);top.append(info,badge);card.append(top);
+ if(task.result){const result=document.createElement("div");result.className="result";result.textContent=task.result;card.append(result)}
+ const actions=document.createElement("div");actions.className="actions";
+ if(["queued","failed"].includes(task.status)){const run=document.createElement("button");run.className="btn primary";run.textContent=task.status==="failed"?"إعادة المحاولة":"ابدأ العمل";run.addEventListener("click",()=>runTask(task));actions.append(run)}
+ if(task.status==="awaiting_approval"){const approve=document.createElement("button");approve.className="btn primary";approve.textContent="اعتماد النتيجة";approve.addEventListener("click",()=>setTaskStatus(task,"approved"));const reject=document.createElement("button");reject.className="btn danger";reject.textContent="رفض";reject.addEventListener("click",()=>setTaskStatus(task,"rejected"));actions.append(approve,reject)}
+ if(task.result&&["approved","completed","rejected"].includes(task.status)){const again=document.createElement("button");again.className="btn secondary";again.textContent="إعادة فتح";again.addEventListener("click",()=>setTaskStatus(task,"queued"));actions.append(again)}
+ const del=document.createElement("button");del.className="btn secondary";del.textContent="حذف";del.addEventListener("click",()=>deleteTask(task));actions.append(del);card.append(actions);root.append(card)}
+}
+async function createTask(){const employee=employees[$("employee").value],title=$("taskTitle").value.trim(),description=$("taskDescription").value.trim();if(!title||!description){$("formStatus").textContent="اكتب عنوان المهمة وتفاصيلها.";return}
+ $("createTask").disabled=true;$("formStatus").textContent="جارٍ حفظ المهمة...";const {error}=await supabase.from("company_tasks").insert({user_id:user.id,department:employee.department,employee_id:$("employee").value,title,description,priority:$("priority").value,requires_approval:$("approvalRequired").checked});$("createTask").disabled=false;if(error){$("formStatus").textContent="تعذر الحفظ: "+error.message;return}$("taskTitle").value="";$("taskDescription").value="";$("formStatus").textContent="تم إسناد المهمة.";await loadTasks()}
+async function runTask(task){const {error:updateError}=await supabase.from("company_tasks").update({status:"working",error_message:null}).eq("id",task.id);if(updateError){alert(updateError.message);return}await loadTasks();const employee=employees[task.employee_id];try{const prompt=employee.prompt+"\n\nعنوان المهمة: "+task.title+"\nتفاصيل المهمة: "+task.description+"\nالأولوية: "+task.priority+"\n\nنفذ التحليل أو إعداد المسودة المطلوبة. أخرج نتيجة عملية ومنظمة باللغة العربية. إذا كانت هناك معلومات ناقصة فاذكرها بوضوح.";
+ const {data,error}=await supabase.functions.invoke("ai-router",{body:{messages:[{role:"user",content:prompt}]}});
+ if(error)throw error;if(data?.error)throw new Error(data.error+(data.details?.length?" — "+data.details.join(" | "):""));const result=typeof data?.text==="string"?data.text:"لم يصل رد نصي من النموذج.";
+ const status=task.requires_approval?"awaiting_approval":"completed";const {error:saveError}=await supabase.from("company_tasks").update({result,status,error_message:null}).eq("id",task.id);if(saveError)throw saveError;
+ }catch(e){await supabase.from("company_tasks").update({status:"failed",error_message:String(e?.message||e)}).eq("id",task.id);alert("تعذر تنفيذ المهمة: "+(e?.message||"خطأ غير معروف"))}await loadTasks()}
+async function setTaskStatus(task,status){const {error}=await supabase.from("company_tasks").update({status}).eq("id",task.id);if(error){alert(error.message);return}await loadTasks()}
+async function deleteTask(task){if(!confirm("هل تريد حذف هذه المهمة؟"))return;const {error}=await supabase.from("company_tasks").delete().eq("id",task.id);if(error){alert(error.message);return}await loadTasks()}
+$("createTask").addEventListener("click",createTask);
+const {data:{session}}=await supabase.auth.getSession();user=session?.user||null;
+if(!user){$("loginNotice").classList.remove("hidden");$("taskList").innerHTML='<div class="empty">سجّل الدخول من الصفحة الرئيسية أولاً.</div>';$("createTask").disabled=true}else{await loadTasks()}
+</script>
+</body></html>
