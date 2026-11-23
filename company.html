@@ -74,36 +74,58 @@ const employees={
  support:{name:"موظف خدمة العملاء",department:"support",prompt:"أنت موظف خدمة عملاء محترف. جهز ردوداً مهذبة وحلولاً وخطوات تصعيد للشكاوى. لا تعد العميل بشيء غير مؤكد."},
  research:{name:"باحث السوق",department:"research",prompt:"أنت باحث سوق. حلل المعلومات التي يقدمها المستخدم، وميز بين الحقائق والافتراضات، وحدد البيانات الناقصة قبل إصدار استنتاجات."}
 };
-let user=null,tasks=[];
+let user=null,tasks=[],runningTaskId=null;
 function escapeText(v){return String(v??"")}
 function statusLabel(s){return ({queued:"في الانتظار",working:"قيد التنفيذ",awaiting_approval:"بانتظار موافقتك",approved:"تمت الموافقة",rejected:"مرفوضة",completed:"مكتملة",failed:"تعذّر التنفيذ"})[s]||s}
 function updateStats(){ $("totalTasks").textContent=tasks.length;$("pendingTasks").textContent=tasks.filter(t=>t.status==="awaiting_approval").length;$("doneTasks").textContent=tasks.filter(t=>["approved","completed"].includes(t.status)).length}
-async function loadTasks(){const {data,error}=await supabase.from("company_tasks").select("*").order("created_at",{ascending:false}).limit(100);if(error){$("taskList").innerHTML='<div class="empty">تعذر تحميل المهام: '+escapeText(error.message)+'</div>';return}tasks=data||[];updateStats();renderTasks()}
+async function recoverStaleTasks(){const cutoff=new Date(Date.now()-5*60*1000).toISOString();const {error}=await supabase.from("company_tasks").update({status:"failed",error_message:"توقف التنفيذ قبل حفظ النتيجة. يمكنك إعادة المحاولة بعد تحديث الصفحة."}).eq("status","working").lt("updated_at",cutoff);if(error)console.warn("Stale task recovery:",error.message)}
+async function loadTasks(){await recoverStaleTasks();const {data,error}=await supabase.from("company_tasks").select("*").order("created_at",{ascending:false}).limit(100);if(error){$("taskList").innerHTML='<div class="empty">تعذر تحميل المهام: '+escapeText(error.message)+'</div>';return}tasks=data||[];updateStats();renderTasks()}
 function renderTasks(){const root=$("taskList");root.innerHTML="";if(!tasks.length){root.innerHTML='<div class="empty">لا توجد مهام بعد. ابدأ بإسناد أول مهمة لفريقك.</div>';return}
  for(const task of tasks){const card=document.createElement("article");card.className="task";const top=document.createElement("div");top.className="task-top";const info=document.createElement("div");const h=document.createElement("h3");h.textContent=task.title;const p=document.createElement("p");p.textContent=employees[task.employee_id]?.name+" · "+task.description;info.append(h,p);const badge=document.createElement("span");badge.className="status "+task.status;badge.textContent=statusLabel(task.status);top.append(info,badge);card.append(top);
  if(task.result){const result=document.createElement("div");result.className="result";result.textContent="نتيجة الموظف:\n"+task.result;card.append(result)}
- if(task.reviewer_status&&task.reviewer_status!=="not_started"){const review=document.createElement("div");review.className="result";const heading=document.createElement("strong");heading.textContent="مراجعة المستشار الاستراتيجي — "+({completed:"اكتملت المراجعة",failed:"تعذرت المراجعة",skipped:"تم تخطي المراجعة"}[task.reviewer_status]||task.reviewer_status);review.append(heading);if(task.reviewer_result){const body=document.createElement("div");body.style.marginTop="8px";body.textContent=task.reviewer_result;review.append(body)}else if(task.reviewer_status==="failed"){const note=document.createElement("div");note.style.marginTop="8px";note.textContent="تم الاحتفاظ بنتيجة الموظف الأصلية، لكن لم يصل تقرير المراجعة. يمكنك مراجعة النتيجة يدويًا.";review.append(note)}card.append(review)}
+ if(task.reviewer_status&&task.reviewer_status!=="not_started"){const review=document.createElement("div");review.className="result";const heading=document.createElement("strong");heading.textContent="مراجعة المستشار الاستراتيجي — "+({completed:"اكتملت المراجعة",failed:"تعذرت المراجعة",skipped:"تم تخطي المراجعة",working:"جارٍ مراجعة النتيجة"}[task.reviewer_status]||task.reviewer_status);review.append(heading);if(task.reviewer_result){const body=document.createElement("div");body.style.marginTop="8px";body.textContent=task.reviewer_result;review.append(body)}else if(task.reviewer_status==="failed"){const note=document.createElement("div");note.style.marginTop="8px";note.textContent="تم الاحتفاظ بنتيجة الموظف الأصلية، لكن لم يصل تقرير المراجعة. يمكنك مراجعة النتيجة يدويًا.";review.append(note)}card.append(review)}
  const actions=document.createElement("div");actions.className="actions";
- if(["queued","failed"].includes(task.status)){const run=document.createElement("button");run.className="btn primary";run.textContent=task.status==="failed"?"إعادة المحاولة":"ابدأ العمل";run.addEventListener("click",()=>runTask(task));actions.append(run)}
+ if(["queued","failed"].includes(task.status)){const run=document.createElement("button");run.className="btn primary";run.textContent=task.status==="failed"?"إعادة المحاولة":"ابدأ العمل";run.disabled=!!runningTaskId;run.addEventListener("click",()=>runTask(task));actions.append(run)}
  if(task.status==="awaiting_approval"){const approve=document.createElement("button");approve.className="btn primary";approve.textContent="اعتماد النتيجة";approve.addEventListener("click",()=>setTaskStatus(task,"approved"));const reject=document.createElement("button");reject.className="btn danger";reject.textContent="رفض";reject.addEventListener("click",()=>setTaskStatus(task,"rejected"));actions.append(approve,reject)}
  if(task.result&&["approved","completed","rejected"].includes(task.status)){const again=document.createElement("button");again.className="btn secondary";again.textContent="إعادة فتح";again.addEventListener("click",()=>setTaskStatus(task,"queued"));actions.append(again)}
  const del=document.createElement("button");del.className="btn secondary";del.textContent="حذف";del.addEventListener("click",()=>deleteTask(task));actions.append(del);card.append(actions);root.append(card)}
 }
 async function createTask(){const employee=employees[$("employee").value],title=$("taskTitle").value.trim(),description=$("taskDescription").value.trim();if(!user){$("formStatus").textContent="انتهت جلسة الدخول. ارجع للصفحة الرئيسية وسجّل الدخول مرة أخرى.";return}if(!title||!description){$("formStatus").textContent="اكتب عنوان المهمة وتفاصيلها قبل الإسناد.";return}
- $("createTask").disabled=true;$("formStatus").textContent="جارٍ حفظ المهمة...";try{const {data,error}=await supabase.from("company_tasks").insert({user_id:user.id,department:employee.department,employee_id:$("employee").value,title,description,priority:$("priority").value,requires_approval:$("approvalRequired").checked}).select("id").single();if(error)throw error;if(!data?.id)throw new Error("لم يؤكد النظام حفظ المهمة.");$("taskTitle").value="";$("taskDescription").value="";$("formStatus").textContent="تم إسناد المهمة بنجاح. جارٍ تحديث قائمة المهام...";await loadTasks();$("formStatus").textContent="تم إسناد المهمة بنجاح."}catch(error){$("formStatus").textContent="تعذر إسناد المهمة: "+(error?.message||String(error))}finally{$("createTask").disabled=false}}
-async function callAiRouter(prompt){const {data,error}=await supabase.functions.invoke("ai-router",{body:{messages:[{role:"user",content:prompt}]}});if(error)throw error;if(data?.error)throw new Error(data.error+(data.details?.length?" — "+data.details.join(" | "):""));const text=typeof data?.text==="string"?data.text.trim():"";if(!text)throw new Error("لم يصل رد نصي قابل للقراءة من نموذج الذكاء الاصطناعي.");return text}
-async function runTask(task){const {error:updateError}=await supabase.from("company_tasks").update({status:"working",error_message:null,reviewer_result:null,reviewer_status:"not_started",reviewed_at:null}).eq("id",task.id);if(updateError){alert(updateError.message);return}await loadTasks();const employee=employees[task.employee_id];try{const prompt=employee.prompt+"\n\nعنوان المهمة: "+task.title+"\nتفاصيل المهمة: "+task.description+"\nالأولوية: "+task.priority+"\n\nنفذ التحليل أو إعداد المسودة المطلوبة. أخرج نتيجة عملية ومنظمة باللغة العربية. إذا كانت هناك معلومات ناقصة فاذكرها بوضوح.";
- const result=await callAiRouter(prompt);
- let reviewerResult=null,reviewerStatus="not_started",reviewedAt=null;
- if(task.employee_id==="chatgpt_advisor"){reviewerStatus="skipped"}
- else{
-  reviewerStatus="failed";
-  try{
-   const reviewPrompt="أنت ChatGPT، المستشار الاستراتيجي الرئيسي والمراجع المستقل في شركة AI-ONE. راجع نتيجة الموظف التالية مراجعة نقدية مهنية ومحايدة. لا تعِد تنفيذ المهمة من الصفر ولا تخترع حقائق أو مصادر أو عمليات تحقق لم تحدث. ميّز بين الحقائق والافتراضات، واذكر ما لا يمكن التحقق منه.\n\nالمهمة: "+task.title+"\nتفاصيلها: "+task.description+"\nالموظف المنفذ: "+employee.name+"\n\nالنتيجة الأصلية للموظف:\n"+result+"\n\nأخرج تقريرًا بالعربية يتضمن: 1) التقييم العام 2) نقاط القوة 3) الأخطاء أو النواقص 4) المخاطر والافتراضات 5) التحسينات المطلوبة 6) التوصية النهائية: قبول أو قبول بعد تعديلات أو إعادة العمل. لا تعتمد إجراءً حساس.";
-   reviewerResult=await callAiRouter(reviewPrompt);reviewerStatus="completed";reviewedAt=new Date().toISOString();
-  }catch(reviewError){reviewerStatus="failed";reviewerResult="تعذرت المراجعة الآلية: "+(reviewError?.message||String(reviewError))}
+ $("createTask").disabled=true;$("formStatus").textContent="جارٍ حفظ المهمة...";try{const {data,error}=await supabase.from("company_tasks").insert({user_id:user.id,department:employee.department,employee_id:$("employee").value,title,description,priority:$("priority").value,requires_approval:$("approvalRequired").checked}).select("id").single();if(error)throw error;if(!data?.id)throw new Error("لم يؤكد النظام حفظ المهمة.");$("taskTitle").value="";$("taskDescription").value="";$("formStatus").textContent="تم إسناد المهمة بنجاح. جارٍ تحديث قائمة المهام...";await loadTasks();$("formStatus").textContent="تم إسناد المهمة بنجاح."}catch(error){$("formStatus").textContent="تعذر إسناد المهمة: "+(error?.message||String(error))async function runTask(task){
+ if(runningTaskId)return;
+ runningTaskId=task.id;renderTasks();
+ try{
+  const {error:updateError}=await supabase.from("company_tasks").update({status:"working",error_message:null,result:null,reviewer_result:null,reviewer_status:"not_started",reviewed_at:null}).eq("id",task.id);
+  if(updateError)throw updateError;
+  await loadTasks();
+  const employee=employees[task.employee_id];
+  const prompt=employee.prompt+"\\n\\nعنوان المهمة: "+task.title+"\\nتفاصيل المهمة: "+task.description+"\\nالأولوية: "+task.priority+"\\n\\nنفذ التحليل أو إعداد المسودة المطلوبة. أخرج نتيجة عملية ومنظمة باللغة العربية. إذا كانت هناك معلومات ناقصة فاذكرها بوضوح.";
+  const result=await callAiRouter(prompt);
+  const status=task.requires_approval?"awaiting_approval":"completed";
+  const initialReviewerStatus=task.employee_id==="chatgpt_advisor"?"skipped":"working";
+  const {error:saveError}=await supabase.from("company_tasks").update({result,status,reviewer_status:initialReviewerStatus,reviewer_result:null,reviewed_at:null,error_message:null}).eq("id",task.id);
+  if(saveError)throw saveError;
+  await loadTasks();
+  if(task.employee_id!=="chatgpt_advisor"){
+   try{
+    const reviewPrompt="أنت ChatGPT، المستشار الاستراتيجي الرئيسي والمراجع المستقل في شركة AI-ONE. راجع نتيجة الموظف التالية مراجعة نقدية مهنية ومحايدة. لا تُعد تنفيذ المهمة من الصفر ولا تخترع حقائق أو مصادر أو عمليات تحقق لم تحدث. ميّز بين الحقائق والافتراضات، واذكر ما لا يمكن التحقق منه.\\n\\nالمهمة: "+task.title+"\\nتفاصيلها: "+task.description+"\\nالموظف المنفذ: "+employee.name+"\\n\\nالنتيجة الأصلية للموظف:\\n"+result+"\\n\\nأخرج تقريرًا بالعربية يتضمن: 1) التقييم العام 2) نقاط القوة 3) الأخطاء أو النواقص 4) المخاطر والافتراضات 5) التحسينات المطلوبة 6) التوصية النهائية: قبول أو قبول بعد تعديلات أو إعادة العمل. لا تعتمد إجراءً حساس.";
+    const reviewerResult=await callAiRouter(reviewPrompt);
+    const {error:reviewSaveError}=await supabase.from("company_tasks").update({reviewer_result:reviewerResult,reviewer_status:"completed",reviewed_at:new Date().toISOString()}).eq("id",task.id);
+    if(reviewSaveError)throw reviewSaveError;
+   }catch(reviewError){
+    const message="تعذرت المراجعة الآلية: "+(reviewError?.message||String(reviewError));
+    await supabase.from("company_tasks").update({reviewer_result:message,reviewer_status:"failed",reviewed_at:new Date().toISOString()}).eq("id",task.id);
+   }
+  }
+ }catch(e){
+  await supabase.from("company_tasks").update({status:"failed",error_message:String(e?.message||e)}).eq("id",task.id);
+  alert("تعذر تنفيذ المهمة: "+(e?.message||"خطأ غير معروف"));
+ }finally{
+  runningTaskId=null;
+  await loadTasks();
  }
- const status=task.requires_approval?"awaiting_approval":"completed";const {error:saveError}=await supabase.from("company_tasks").update({result,status,reviewer_result:reviewerResult,reviewer_status:reviewerStatus,reviewed_at:reviewedAt,error_message:null}).eq("id",task.id);if(saveError)throw saveError;
+}
+ing_approval":"completed";const {error:saveError}=await supabase.from("company_tasks").update({result,status,reviewer_result:reviewerResult,reviewer_status:reviewerStatus,reviewed_at:reviewedAt,error_message:null}).eq("id",task.id);if(saveError)throw saveError;
  }catch(e){await supabase.from("company_tasks").update({status:"failed",error_message:String(e?.message||e)}).eq("id",task.id);alert("تعذر تنفيذ المهمة: "+(e?.message||"خطأ غير معروف"))}await loadTasks()}
 async function setTaskStatus(task,status){const {error}=await supabase.from("company_tasks").update({status}).eq("id",task.id);if(error){alert(error.message);return}await loadTasks()}
 async function deleteTask(task){if(!confirm("هل تريد حذف هذه المهمة؟"))return;const {error}=await supabase.from("company_tasks").delete().eq("id",task.id);if(error){alert(error.message);return}await loadTasks()}
