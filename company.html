@@ -87,6 +87,7 @@ function renderTasks(){const root=$("taskList");root.innerHTML="";if(!tasks.leng
  const actions=document.createElement("div");actions.className="actions";
  if(["queued","failed"].includes(task.status)){const run=document.createElement("button");run.className="btn primary";run.textContent=task.status==="failed"?"إعادة المحاولة":"ابدأ العمل";run.disabled=!!runningTaskId;run.addEventListener("click",()=>runTask(task));actions.append(run)}
  if(task.status==="awaiting_approval"){const approve=document.createElement("button");approve.className="btn primary";approve.textContent="اعتماد النتيجة";approve.addEventListener("click",()=>setTaskStatus(task,"approved"));const reject=document.createElement("button");reject.className="btn danger";reject.textContent="رفض";reject.addEventListener("click",()=>setTaskStatus(task,"rejected"));actions.append(approve,reject)}
+ if(task.result&&task.employee_id!=="chatgpt_advisor"&&["working","failed"].includes(task.reviewer_status)){const reviewAgain=document.createElement("button");reviewAgain.className="btn primary";reviewAgain.textContent="استكمال مراجعة المستشار";reviewAgain.disabled=!!runningTaskId;reviewAgain.addEventListener("click",()=>reviewTask(task));actions.append(reviewAgain)}
  if(task.result&&["approved","completed","rejected"].includes(task.status)){const again=document.createElement("button");again.className="btn secondary";again.textContent="إعادة فتح";again.addEventListener("click",()=>setTaskStatus(task,"queued"));actions.append(again)}
  const del=document.createElement("button");del.className="btn secondary";del.textContent="حذف";del.addEventListener("click",()=>deleteTask(task));actions.append(del);card.append(actions);root.append(card)}
 }
@@ -96,6 +97,36 @@ async function callAiRouter(prompt){
  if(data?.error)throw new Error(data.error+(data.details?.length?" — "+data.details.join(" | "):""));
  if(typeof data?.text!=="string"||!data.text.trim())throw new Error("لم يصل رد نصي من نموذج الذكاء الاصطناعي.");
  return data.text.trim();
+}
+async function reviewTask(task){
+ if(runningTaskId||!task.result||task.employee_id==="chatgpt_advisor")return;
+ runningTaskId="review-"+task.id;
+ renderTasks();
+ const employee=employees[task.employee_id];
+ try{
+  const {error:startError}=await supabase.from("company_tasks").update({
+   reviewer_status:"working",reviewer_result:null,reviewed_at:null
+  }).eq("id",task.id).eq("user_id",user.id);
+  if(startError)throw startError;
+  await loadTasks();
+  const reviewPrompt="أنت ChatGPT، المستشار الاستراتيجي الرئيسي والمراجع المستقل في شركة AI-ONE. راجع نتيجة الموظف التالية مراجعة نقدية مهنية ومحايدة. لا تُعد تنفيذ المهمة من الصفر ولا تخترع حقائق أو مصادر أو عمليات تحقق لم تحدث. ميّز بين الحقائق والافتراضات، واذكر ما لا يمكن التحقق منه.\\n\\nالمهمة: "+task.title+
+   "\\nتفاصيلها: "+task.description+"\\nالموظف المنفذ: "+(employee?.name||task.employee_id)+
+   "\\n\\nالنتيجة الأصلية للموظف:\\n"+task.result+
+   "\\n\\nأخرج تقريرًا بالعربية يتضمن: 1) التقييم العام 2) نقاط القوة 3) الأخطاء أو النواقص 4) المخاطر والافتراضات 5) التحسينات المطلوبة 6) التوصية النهائية: قبول أو قبول بعد تعديلات أو إعادة العمل. لا تعتمد إجراءً حساس.";
+  const reviewerResult=await callAiRouter(reviewPrompt);
+  const {error:saveError}=await supabase.from("company_tasks").update({
+   reviewer_result:reviewerResult,reviewer_status:"completed",reviewed_at:new Date().toISOString()
+  }).eq("id",task.id).eq("user_id",user.id);
+  if(saveError)throw saveError;
+ }catch(error){
+  await supabase.from("company_tasks").update({
+   reviewer_result:"تعذرت المراجعة الآلية: "+(error?.message||String(error)),
+   reviewer_status:"failed",reviewed_at:new Date().toISOString()
+  }).eq("id",task.id).eq("user_id",user.id);
+ }finally{
+  runningTaskId=null;
+  await loadTasks();
+ }
 }
 async function createTask(){
  const employeeId=$("employee").value;
