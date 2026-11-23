@@ -48,7 +48,7 @@ a{color:#c8c0ff;text-decoration:none}main{width:min(1180px,calc(100% - 28px));ma
 <div class="employee"><div class="ico">🔎</div><b>باحث السوق</b><small>تحليل المنافسين والفرص والأسعار عند تزويده بالمعلومات.</small><span class="tag">Research</span></div>
 </div></section>
 <section class="panel"><h2>إسناد مهمة إلى موظف</h2><div class="form-grid">
-<div><label for="employee">اختر الموظف</label><select id="employee"><option value="ceo">المدير التنفيذي</option><option value="hr">مسؤول الموارد البشرية</option><option value="marketing">مدير التسويق</option><option value="email">مسؤول الإيميلات</option><option value="finance">المحلل المالي</option><option value="sales">مدير المبيعات</option><option value="support">خدمة العملاء</option><option value="research">باحث السوق</option></select></div>
+<div><label for="employee">اختر الموظف</label><select id="employee"><option value="chatgpt_advisor">ChatGPT – المستشار الاستراتيجي الرئيسي</option><option value="ceo">المدير التنفيذي</option><option value="hr">مسؤول الموارد البشرية</option><option value="marketing">مدير التسويق</option><option value="email">مسؤول الإيميلات</option><option value="finance">المحلل المالي</option><option value="sales">مدير المبيعات</option><option value="support">خدمة العملاء</option><option value="research">باحث السوق</option></select></div>
 <div><label for="priority">الأولوية</label><select id="priority"><option value="normal">عادية</option><option value="high">مرتفعة</option><option value="urgent">عاجلة</option><option value="low">منخفضة</option></select></div>
 <div class="full"><label for="taskTitle">عنوان المهمة</label><input id="taskTitle" maxlength="180" placeholder="مثال: إعداد خطة تسويق لمنتج جديد"></div>
 <div class="full"><label for="taskDescription">تفاصيل المهمة</label><textarea id="taskDescription" placeholder="اكتب المطلوب والهدف وأي تفاصيل تساعد الموظف..."></textarea></div>
@@ -64,6 +64,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 const supabase=createClient("https://ccizidvgbuqhjjmvncvv.supabase.co","sb_publishable_f2bGVyttaHar4NYbv6r04A_97joyQdM");
 const $=id=>document.getElementById(id);
 const employees={
+ chatgpt_advisor:{name:"ChatGPT – المستشار الاستراتيجي الرئيسي",department:"executive",prompt:"أنت المستشار الاستراتيجي الرئيسي والمشرف العام في شركة AI-ONE. تتبع صاحب الشركة مباشرة، وتساعد المدير التنفيذي وباقي الأقسام. حلل المهمة من منظور استراتيجي، راجع المخاطر والافتراضات، وضع توصيات عملية قابلة للقياس، وحدد المسؤوليات والخطوات التالية. عند مراجعة عمل موظف آخر، قيّم الدقة والاكتمال والجودة واقترح التصحيح. لا تدّع أنك تواصلت مع موظف فعلي أو نفذت إجراء خارجياً، ولا تعتمد قرارات أو إجراءات حساسة؛ ارفعها لصاحب الشركة للموافقة."},
  ceo:{name:"المدير التنفيذي",department:"executive",prompt:"أنت المدير التنفيذي في شركة افتراضية. حلل المطلوب، رتب الأولويات، واقترح خطة تنفيذ عملية بمراحل ومسؤوليات ومخاطر. لا تدّع أنك نفذت أي إجراء خارجي."},
  hr:{name:"مسؤول الموارد البشرية",department:"hr",prompt:"أنت مسؤول موارد بشرية محترف. أعد أو حلل أوصاف الوظائف والسير الذاتية وأسئلة المقابلات وخطط التوظيف. لا تتخذ قرارات توظيف نهائية ولا تخترع بيانات مرشحين."},
  marketing:{name:"مدير التسويق",department:"marketing",prompt:"أنت مدير تسويق محترف. حلل الجمهور والمنتج، واقترح استراتيجية وحملة ومحتوى ومؤشرات قياس. لا تدّع نشر إعلان أو إنفاق ميزانية."},
